@@ -1,0 +1,43 @@
+{
+  "name": "license-subscription-system",
+  "version": "1.0.0",
+  "description": "License Subscription Management System",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "npm run build:client",
+    "build:client": "cd client && npm run build",
+    "start": "vercel dev",
+    "deploy": "vercel --prod",
+    "install:all": "npm install && cd client && npm install"
+  },
+  "keywords": [
+    "license",
+    "subscription",
+    "management",
+    "supabase",
+    "react"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@hookform/resolvers": "^5.2.1",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/material": "^7.3.1",
+    "@supabase/supabase-js": "^2.55.0",
+    "@testing-library/user-event": "^14.6.1",
+    "axios": "^1.11.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.540.0",
+    "react-hook-form": "^7.62.0",
+    "react-router-dom": "^7.8.1",
+    "yup": "^1.7.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
+}
