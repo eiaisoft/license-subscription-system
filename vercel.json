@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:client",
-  "outputDirectory": "client/build",
-  "installCommand": "npm run install:all",
+  "buildCommand": "echo 'Skipping client build - API only deployment'",
+  "installCommand": "npm install",
   "env": {
     "CI": "false",
     "GENERATE_SOURCEMAP": "false",
@@ -13,14 +12,15 @@
       "CI": "false"
     }
   },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"
-    },
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
     }
   ]
 }
