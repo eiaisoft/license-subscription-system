@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "License Subscription Management System",
   "main": "index.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'API-only build completed'",
