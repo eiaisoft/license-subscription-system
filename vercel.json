@@ -1,20 +1,21 @@
 {
   "version": 2,
-  "buildCommand": "echo 'Skipping client build for API-only deployment'",
-  "installCommand": "npm install",
-  "outputDirectory": ".",
+  "buildCommand": "cd client && npm run build",
+  "outputDirectory": "client/build",
+  "installCommand": "npm install && cd client && npm install",
   "functions": {
     "api/**/*.js": {
-      "runtime": "@vercel/node@3.0.0"
+      "runtime": "nodejs22.x"
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/client/build/$1"
     }
-  ],
-  "env": {
-    "CI": "false"
-  }
+  ]
 }
