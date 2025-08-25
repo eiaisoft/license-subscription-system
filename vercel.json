@@ -1,17 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "echo 'Skipping client build - API only deployment'",
+  "buildCommand": "echo 'Skipping client build for API-only deployment'",
   "installCommand": "npm install",
-  "env": {
-    "CI": "false",
-    "GENERATE_SOURCEMAP": "false",
-    "VERCEL_PROTECTION_BYPASS": "YAXJQUTWb2ostCnhbIn58hxSP5QLdSOa"
-  },
-  "build": {
-    "env": {
-      "CI": "false"
-    }
-  },
+  "outputDirectory": ".",
   "functions": {
     "api/**/*.js": {
       "runtime": "@vercel/node@3.0.0"
@@ -22,5 +13,8 @@
       "source": "/api/(.*)",
       "destination": "/api/$1"
     }
-  ]
+  ],
+  "env": {
+    "CI": "false"
+  }
 }
