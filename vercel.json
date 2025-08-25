@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
+  "buildCommand": "npm run build:client",
   "outputDirectory": "client/build",
-  "installCommand": "npm install",
+  "installCommand": "npm run install:all",
   "env": {
     "CI": "false",
-    "GENERATE_SOURCEMAP": "false"
+    "GENERATE_SOURCEMAP": "false",
+    "VERCEL_PROTECTION_BYPASS": "YAXJQUTWb2ostCnhbIn58hxSP5QLdSOa"
   },
   "build": {
     "env": {

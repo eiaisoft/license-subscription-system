@@ -69,21 +69,25 @@ module.exports = async (req, res) => {
     );
 
     res.status(200).json({
-      message: '로그인 성공',
-      token,
-      user: {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        role: userData.role,
-        institution: userData.institutions
-      }
+      success: true,
+      data: {
+        token,
+        user: {
+          id: userData.id,
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          institution: userData.institutions
+        }
+      },
+      message: '로그인 성공'
     });
   } catch (error) {
     console.error('Login API error:', error);
     res.status(500).json({ 
+      success: false,
       error: '서버 오류가 발생했습니다.',
-      details: error.message 
+      message: error.message 
     });
   }
 };

@@ -57,10 +57,11 @@ module.exports = async (req, res) => {
     // JWT 토큰 생성
     const token = jwt.sign(
       {
-        userId: userData.id,
+        id: userData.id,
         email: userData.email,
+        name: userData.name,
         role: userData.role,
-        institutionId: userData.institution_id
+        institution_id: userData.institution_id
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
