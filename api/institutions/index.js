@@ -19,14 +19,32 @@ module.exports = async (req, res) => {
   try {
     switch (req.method) {
       case 'GET':
-        // 기관 목록 조회 (인증 불필요 - 회원가입용)
+        // 관리자인 경우 모든 기관 조회, 일반 사용자는 활성 기관만 조회
         console.log('Fetching institutions...');
         
-        const { data: institutions, error: getError } = await supabase
-          .from('institutions')
-          .select('*')
-          .eq('status', 'active')
-          .order('name');
+        // 인증 헤더 확인
+        const authHeader = req.headers.authorization;
+        let isAdmin = false;
+        
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          try {
+            const jwt = require('jsonwebtoken');
+            const token = authHeader.substring(7);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            isAdmin = decoded.role === 'admin';
+          } catch (err) {
+            // 토큰이 유효하지 않아도 공개 API로 처리
+          }
+        }
+        
+        let query = supabase.from('institutions').select('*');
+        
+        // 관리자가 아닌 경우 활성 기관만 조회
+        if (!isAdmin) {
+          query = query.eq('status', 'active');
+        }
+        
+        const { data: institutions, error: getError } = await query.order('name');
 
         if (getError) {
           console.error('Supabase error:', getError);
@@ -48,7 +66,7 @@ module.exports = async (req, res) => {
         if (!user) return; // 이미 응답 전송됨
 
         if (req.method === 'POST') {
-          // 새 기관 생성 (관리자만)
+          // 새 기관 생성 (관리자만) - 기본 상태를 'inactive'로 변경
           if (user.role !== 'admin') {
             return res.status(403).json({ 
               success: false,
@@ -57,7 +75,7 @@ module.exports = async (req, res) => {
             });
           }
 
-          const { name, domain, address, phone } = req.body;
+          const { name, domain, contact_email } = req.body;
           if (!name || !domain) {
             return res.status(400).json({ 
               success: false,
@@ -68,7 +86,12 @@ module.exports = async (req, res) => {
 
           const { data: newInstitution, error: createError } = await supabase
             .from('institutions')
-            .insert({ name, domain, address, phone, status: 'active' })
+            .insert({ 
+              name, 
+              domain, 
+              contact_email, 
+              is_active: false // 기본값을 false(비활성)로 변경
+            })
             .select()
             .single();
 
@@ -76,7 +99,7 @@ module.exports = async (req, res) => {
           return res.status(201).json({ 
             success: true,
             data: { institution: newInstitution },
-            message: '기관이 성공적으로 생성되었습니다.'
+            message: '기관이 성공적으로 생성되었습니다. (기본 상태: 비활성)'
           });
         }
 

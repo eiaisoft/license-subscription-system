@@ -17,13 +17,17 @@ import {
   TextField,
   IconButton,
   Chip,
-  Tooltip
+  Tooltip,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Business as BusinessIcon
+  Business as BusinessIcon,
+  ToggleOn as ToggleOnIcon,
+  ToggleOff as ToggleOffIcon
 } from '@mui/icons-material';
 import { Institution } from '../../types';
 import { institutionsAPI } from '../../lib/api';
@@ -46,14 +50,13 @@ const InstitutionManagement: React.FC = () => {
     name: '',
     domain: '',
     contact_email: '',
-    is_active: true
+    is_active: false // 기본값을 false로 변경
   });
 
-  // 새로운 에러 처리 시스템 사용
   const { handleApiError } = useErrorHandler();
   const { showSuccess } = useToast();
 
-  // 기관 목록 조회
+  // 기관 목록 조회 (관리자는 모든 기관 조회)
   const fetchInstitutions = useCallback(async () => {
     try {
       setLoading(true);
@@ -65,6 +68,21 @@ const InstitutionManagement: React.FC = () => {
       setLoading(false);
     }
   }, [handleApiError]);
+
+  // 기관 상태 토글
+  const handleToggleStatus = async (institution: Institution) => {
+    try {
+      const newStatus = !institution.is_active;
+      await institutionsAPI.update(institution.id, {
+        ...institution,
+        is_active: newStatus
+      });
+      showSuccess(`기관이 ${newStatus ? '활성화' : '비활성화'}되었습니다.`);
+      fetchInstitutions();
+    } catch (err) {
+      handleApiError(err, '기관 상태 변경');
+    }
+  };
 
   // 기관 추가/수정
   const handleSubmit = async () => {
@@ -106,7 +124,7 @@ const InstitutionManagement: React.FC = () => {
       name: '',
       domain: '',
       contact_email: '',
-      is_active: true
+      is_active: false // 기본값을 false로 변경
     });
     setEditingInstitution(null);
   };
@@ -187,11 +205,22 @@ const InstitutionManagement: React.FC = () => {
                     <TableCell>{institution.domain}</TableCell>
                     <TableCell>{institution.contact_email}</TableCell>
                     <TableCell>
-                      <Chip
-                        label={institution.is_active ? '활성' : '비활성'}
-                        color={institution.is_active ? 'success' : 'default'}
-                        size="small"
-                      />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Chip
+                          label={institution.is_active ? '활성' : '비활성'}
+                          color={institution.is_active ? 'success' : 'default'}
+                          size="small"
+                        />
+                        <Tooltip title={institution.is_active ? '비활성화' : '활성화'}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleToggleStatus(institution)}
+                            color={institution.is_active ? 'success' : 'default'}
+                          >
+                            {institution.is_active ? <ToggleOnIcon /> : <ToggleOffIcon />}
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                     <TableCell>
                       {new Date(institution.created_at).toLocaleDateString()}
@@ -252,6 +281,15 @@ const InstitutionManagement: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
               fullWidth
               required
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                />
+              }
+              label="활성 상태"
             />
           </Box>
         </DialogContent>
