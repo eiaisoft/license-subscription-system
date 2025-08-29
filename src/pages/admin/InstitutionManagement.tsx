@@ -43,26 +43,26 @@ interface InstitutionFormData {
 
 const InstitutionManagement: React.FC = () => {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [editingInstitution, setEditingInstitution] = useState<Institution | null>(null);
   const [formData, setFormData] = useState<InstitutionFormData>({
     name: '',
     domain: '',
     contact_email: '',
-    is_active: false // 기본값을 false로 변경
+    is_active: false
   });
 
   const { handleApiError } = useErrorHandler();
   const { showSuccess } = useToast();
 
   // 기관 목록 조회 (관리자는 모든 기관 조회)
-  const fetchInstitutions = useCallback(async () => {
+  const fetchInstitutions = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       const response = await institutionsAPI.getAll();
       setInstitutions(response.data.institutions || []);
-    } catch (err) {
+    } catch (err: unknown) {
       handleApiError(err, '기관 목록 조회');
     } finally {
       setLoading(false);
@@ -70,7 +70,7 @@ const InstitutionManagement: React.FC = () => {
   }, [handleApiError]);
 
   // 기관 상태 토글
-  const handleToggleStatus = async (institution: Institution) => {
+  const handleToggleStatus = async (institution: Institution): Promise<void> => {
     try {
       const newStatus = !institution.is_active;
       await institutionsAPI.update(institution.id, {
@@ -79,13 +79,13 @@ const InstitutionManagement: React.FC = () => {
       });
       showSuccess(`기관이 ${newStatus ? '활성화' : '비활성화'}되었습니다.`);
       fetchInstitutions();
-    } catch (err) {
+    } catch (err: unknown) {
       handleApiError(err, '기관 상태 변경');
     }
   };
 
   // 기관 추가/수정
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     try {
       if (editingInstitution) {
         await institutionsAPI.update(editingInstitution.id, formData);
@@ -98,13 +98,13 @@ const InstitutionManagement: React.FC = () => {
       setOpenDialog(false);
       resetForm();
       fetchInstitutions();
-    } catch (err) {
+    } catch (err: unknown) {
       handleApiError(err, editingInstitution ? '기관 수정' : '기관 추가');
     }
   };
 
   // 기관 삭제
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string): Promise<void> => {
     if (!window.confirm('정말로 이 기관을 삭제하시겠습니까?')) {
       return;
     }
@@ -113,24 +113,24 @@ const InstitutionManagement: React.FC = () => {
       await institutionsAPI.delete(id);
       showSuccess('기관이 성공적으로 삭제되었습니다.');
       fetchInstitutions();
-    } catch (err) {
+    } catch (err: unknown) {
       handleApiError(err, '기관 삭제');
     }
   };
 
   // 폼 초기화
-  const resetForm = () => {
+  const resetForm = (): void => {
     setFormData({
       name: '',
       domain: '',
       contact_email: '',
-      is_active: false // 기본값을 false로 변경
+      is_active: false
     });
     setEditingInstitution(null);
   };
 
   // 수정 모드로 전환
-  const handleEdit = (institution: Institution) => {
+  const handleEdit = (institution: Institution): void => {
     setEditingInstitution(institution);
     setFormData({
       name: institution.name,
@@ -142,7 +142,7 @@ const InstitutionManagement: React.FC = () => {
   };
 
   // 새 기관 추가 모드
-  const handleAdd = () => {
+  const handleAdd = (): void => {
     resetForm();
     setOpenDialog(true);
   };
@@ -154,7 +154,6 @@ const InstitutionManagement: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* 헤더 */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <BusinessIcon color="primary" />
@@ -171,10 +170,9 @@ const InstitutionManagement: React.FC = () => {
         </Button>
       </Box>
 
-      {/* 기관 목록 테이블 */}
-      <Paper>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
-          <Table>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>기관명</TableCell>
@@ -199,7 +197,7 @@ const InstitutionManagement: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                institutions.map((institution) => (
+                institutions.map((institution: Institution) => (
                   <TableRow key={institution.id}>
                     <TableCell>{institution.name}</TableCell>
                     <TableCell>{institution.domain}</TableCell>
@@ -262,14 +260,14 @@ const InstitutionManagement: React.FC = () => {
             <TextField
               label="기관명"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
               fullWidth
               required
             />
             <TextField
               label="도메인"
               value={formData.domain}
-              onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, domain: e.target.value })}
               fullWidth
               required
               placeholder="example.com"
@@ -278,7 +276,7 @@ const InstitutionManagement: React.FC = () => {
               label="연락처 이메일"
               type="email"
               value={formData.contact_email}
-              onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, contact_email: e.target.value })}
               fullWidth
               required
             />
@@ -286,7 +284,7 @@ const InstitutionManagement: React.FC = () => {
               control={
                 <Switch
                   checked={formData.is_active}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, is_active: e.target.checked })}
                 />
               }
               label="활성 상태"
