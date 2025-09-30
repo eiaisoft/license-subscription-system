@@ -113,6 +113,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     navigate('/login');
   };
 
+  const handleProfileSettings = () => {
+    handleProfileMenuClose();
+    navigate('/admin/profile');
+  };
+
+  const handleAccountSettings = () => {
+    handleProfileMenuClose();
+    navigate('/admin/settings');
+  };
+
   const drawer = (
     <Box>
       <Toolbar sx={{ 
@@ -331,7 +341,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <AccountIcon sx={{ mr: 2 }} />
           프로필 설정
         </MuiMenuItem>
-        <MuiMenuItem onClick={handleProfileMenuClose}>
+        <MuiMenuItem onClick={handleAccountSettings}>
           <SettingsIcon sx={{ mr: 2 }} />
           계정 설정
         </MuiMenuItem>
